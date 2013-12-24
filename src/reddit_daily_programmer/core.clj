@@ -71,7 +71,7 @@
                new-count
                new-idx)))))
 
-(defn interm-146
+(defn interm-140
   [node-num adj-str]
   (when node-num
     (let [adj-arr (into [] (clojure.string/split adj-str #"\n\s+"))]
@@ -86,3 +86,39 @@
                    (if (< radius lowest-radius)
                      radius
                      lowest-radius))))))))
+
+(defn build-node-list
+  [adj-str]
+  (let [adj-arr (into [] (clojure.string/split adj-str #"\n\s+"))]
+    (loop
+      [node-adj-map {}
+       curr-node    (first adj-arr)
+       rest-nodes   (rest adj-arr)]
+      (if curr-node
+        (recur
+          (merge node-adj-map
+                (let [nodes (clojure.string/split curr-node #"\s")
+                      root  (first nodes)
+                      adj   (rest nodes)]
+                  {root adj}))
+          (first rest-nodes)
+          (rest rest-nodes))
+        node-adj-map))))
+
+(defn- bfs-and-color
+  [node-adj-map]
+  )
+
+(defn hard-130
+  [num-of-nodes node-adj-list]
+  ;; BFS through each node
+  ;; comparing node with existing colored nodes
+  ;;   if node is already in coloreds make sure it makes sense
+  ;;   else add the node and color it
+  ;;   also need to keep track of node relationships
+  ;;     hashmap where key ="node value", value="connected nodes"
+
+  ;; build node list
+  (let [node-list (build-node-list node-adj-list)]
+    (println "node-list:" node-list)
+    (bfs-and-color node-list)))
