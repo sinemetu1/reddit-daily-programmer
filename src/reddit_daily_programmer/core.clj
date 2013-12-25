@@ -91,12 +91,12 @@
   [adj-str]
   (let [adj-arr (into [] (clojure.string/split adj-str #"\n\s+"))]
     (loop
-      [node-adj-map {}
+      [node-adj-map []
        curr-node    (first adj-arr)
        rest-nodes   (rest adj-arr)]
       (if curr-node
         (recur
-          (merge node-adj-map
+          (into node-adj-map
                 (let [nodes (clojure.string/split curr-node #"\s")
                       root  (first nodes)
                       adj   (rest nodes)]
@@ -105,9 +105,71 @@
           (rest rest-nodes))
         node-adj-map))))
 
+(defn- get-first-exluded-val
+  [values]
+  (first (for [x (iterate inc 0)
+                                :when (not (some #(= x %) values))]
+                            x)))
+(defn visit-node
+  [a-node node-map]
+  (let [root       (first a-node)
+        adj-list   (flatten (rest a-node))
+        adj-values (map #(get node-map %) adj-list)
+        val-to-use (get-first-exluded-val (cons (get node-map root) adj-values))
+        has-root?  (not (nil? (get node-map root)))
+        adj-val-to-use (if has-root?
+                         val-to-use
+                         (inc val-to-use))]
+    (loop [adj-node   (first adj-list)
+           rest-nodes (rest adj-list)
+           to-ret (if has-root?
+                    node-map
+                    (merge node-map {root val-to-use}))]
+      (println "to-ret:" to-ret)
+      (if adj-node
+        (recur
+          (first rest-nodes)
+          (rest rest-nodes)
+          (let [curr-node-value (get to-ret adj-node)
+                root-value      (get node-map root)]
+            (if (and curr-node-value
+                     (not (= curr-node-value root-value)))
+              to-ret
+              (merge to-ret {adj-node adj-val-to-use}))))
+        to-ret))))
+
+    ;(loop [try-value 0]
+      ;(if (some #(= try-value %) adj-values)
+        ;(recur (inc try-value))
+        ;(merge node-map {root try-value})))))
+    ;(loop
+      ;[adj      (first adj-list)
+       ;rest-adj (rest adj-list)
+       ;to-ret   (merge node-map {root 0})]
+      ;(if adj
+        ;(recur
+          ;(first rest-adj)
+          ;(rest rest-adj)
+          ;(if (get to-ret adj)
+            ;to-ret
+            ;(merge to-ret {adj 1})))
+        ;to-ret))))
+
 (defn- bfs-and-color
   [node-adj-map]
-  )
+  (loop
+    [node-queue '[]
+     to-ret     {}
+     curr-node  (first node-adj-map)
+     rest-nodes (rest node-adj-map)]
+    (println "curr-node:" curr-node)
+    (if curr-node
+      (recur
+        node-queue
+        (visit-node curr-node to-ret)
+        (first rest-nodes)
+        (rest rest-nodes))
+      to-ret)))
 
 (defn hard-130
   [num-of-nodes node-adj-list]
