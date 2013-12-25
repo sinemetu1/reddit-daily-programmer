@@ -65,37 +65,23 @@
                       ;0 0 0 1 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0
                       ;0 0 0 0 1 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0") 5)))
 
-;64 40 32 65
-;65 64 32 31
-;31 65 32 82 81 11 9
-;9 31 11 66
-;66 9 11
-;40 33 47 32 64
-;32 40 47 82 31 65 64
-;11 31 81 34 66 9
-;
-;to-visit: 
-;root: 32
-;nodes: => exist vals: 1 0 => 2
-;visited: []
+(deftest test-build-node-list
+  (is (= (build-node-list "64 40 32 65
+                           65 64 32 31")
+         [["64" '("40" "32" "65")]
+          ["65" '("64" "32" "31")]])))
 
-;(deftest test-build-node-list
-  ;(is (= (build-node-list "64 40 32 65
-                           ;65 64 32 31")
-         ;[["64" '("40" "32" "65")]
-          ;["65" '("64" "32" "31")]])))
+(deftest test-visit-node
+  (let [actual (visit-node [65 '(64 32 31)] {32 0
+                                             31 2})]
+    (is (= (get actual 65) 1)))
 
-;(deftest test-visit-node
-  ;(let [actual (visit-node [65 '(64 32 31)] {32 0
-                                             ;31 2})]
-    ;(is (= (get actual 65) 1)))
-
-  ;(let [actual (visit-node [65 '(64 32 31)] {32 1 
-                                             ;31 2})]
-    ;(is (= (get actual 65) 0)))
-  ;(let [actual (visit-node [65 '(64 32 31)] {32 0 
-                                             ;31 1})]
-    ;(is (= (get actual 65) 2))))
+  (let [actual (visit-node [65 '(64 32 31)] {32 1 
+                                             31 2})]
+    (is (= (get actual 65) 0)))
+  (let [actual (visit-node [65 '(64 32 31)] {32 0 
+                                             31 1})]
+    (is (= (get actual 65) 2))))
 
 (deftest test-hard-130
   (let [actual (hard-130 "8"
@@ -107,14 +93,31 @@
                     40 33 47 32 64
                     32 40 47 82 31 65 64
                     11 31 81 34 66 9")]
-    (println "actual:" actual)
-    (is (= actual "64 0
-                   65 1
-                   31 0
-                   9 1
-                   66 0
-                   40 1
-                   32 2
-                   11 2"))))
+    (is (= (sort actual) '(["11" 2]
+                           ["31" 1]
+                           ["32" 2]
+                           ["33" 1]
+                           ["34" 0]
+                           ["40" 0]
+                           ["47" 1]
+                           ["64" 1]
+                           ["65" 0]
+                           ["66" 1]
+                           ["81" 0]
+                           ["82" 0]
+                           ["9" 0]))))
+  (let [actual (hard-130 "6"
+                         "1 4 6
+                          2 3 5
+                          3 2 6
+                          4 1 5
+                          5 2 4
+                          6 1 3")]
+    (is (= (sort actual) '(["1" 2]
+                           ["2" 2]
+                           ["3" 0]
+                           ["4" 0]
+                           ["5" 1]
+                           ["6" 1])))))
 
 (run-tests 'reddit-daily-programmer.core-test)

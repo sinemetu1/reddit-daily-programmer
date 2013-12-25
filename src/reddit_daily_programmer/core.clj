@@ -62,8 +62,8 @@
                                   [(keyword (str a-node)) (inc radius)]))
             new-radius    ((keyword (str curr-node)) new-level-map)
             new-idx       (inc idx)]
-        (println "new-nodes:" new-nodes "new-level-map:" new-level-map "new-count:" new-count
-                 "new-radius:" new-radius)
+        ;(println "new-nodes:" new-nodes "new-level-map:" new-level-map "new-count:" new-count
+                 ;"new-radius:" new-radius)
         (recur new-level-map
                new-radius
                new-nodes
@@ -82,7 +82,7 @@
           lowest-radius
           (recur (dec node-idx)
                  (let [radius (get-radius-from node-idx adj-arr (Integer/valueOf node-num))]
-                   (println "node-idx" node-idx " radius:" radius)
+                   ;(println "node-idx" node-idx " radius:" radius)
                    (if (< radius lowest-radius)
                      radius
                      lowest-radius))))))))
@@ -117,6 +117,7 @@
         adj-values (map #(get node-map %) adj-list)
         val-to-use (get-first-exluded-val (cons (get node-map root) adj-values))
         has-root?  (not (nil? (get node-map root)))
+        non-exist-adj-value (get-first-exluded-val (list (get node-map root)))
         adj-val-to-use (if has-root?
                          val-to-use
                          (inc val-to-use))]
@@ -125,35 +126,20 @@
            to-ret (if has-root?
                     node-map
                     (merge node-map {root val-to-use}))]
-      (println "to-ret:" to-ret)
       (if adj-node
         (recur
           (first rest-nodes)
           (rest rest-nodes)
-          (let [curr-node-value (get to-ret adj-node)
-                root-value      (get node-map root)]
-            (if (and curr-node-value
-                     (not (= curr-node-value root-value)))
-              to-ret
-              (merge to-ret {adj-node adj-val-to-use}))))
+          (let [curr-node-value        (get to-ret adj-node)
+                root-value             (get node-map root)
+                exists-and-diff-value? (and curr-node-value
+                                           (not (= curr-node-value root-value)))
+                doesnt-exist?          (nil? curr-node-value)]
+            (cond
+              exists-and-diff-value? to-ret
+              doesnt-exist? (merge to-ret {adj-node non-exist-adj-value})
+              :else (merge to-ret {adj-node adj-val-to-use}))))
         to-ret))))
-
-    ;(loop [try-value 0]
-      ;(if (some #(= try-value %) adj-values)
-        ;(recur (inc try-value))
-        ;(merge node-map {root try-value})))))
-    ;(loop
-      ;[adj      (first adj-list)
-       ;rest-adj (rest adj-list)
-       ;to-ret   (merge node-map {root 0})]
-      ;(if adj
-        ;(recur
-          ;(first rest-adj)
-          ;(rest rest-adj)
-          ;(if (get to-ret adj)
-            ;to-ret
-            ;(merge to-ret {adj 1})))
-        ;to-ret))))
 
 (defn- bfs-and-color
   [node-adj-map]
@@ -162,7 +148,6 @@
      to-ret     {}
      curr-node  (first node-adj-map)
      rest-nodes (rest node-adj-map)]
-    (println "curr-node:" curr-node)
     (if curr-node
       (recur
         node-queue
@@ -173,14 +158,6 @@
 
 (defn hard-130
   [num-of-nodes node-adj-list]
-  ;; BFS through each node
-  ;; comparing node with existing colored nodes
-  ;;   if node is already in coloreds make sure it makes sense
-  ;;   else add the node and color it
-  ;;   also need to keep track of node relationships
-  ;;     hashmap where key ="node value", value="connected nodes"
-
-  ;; build node list
-  (let [node-list (build-node-list node-adj-list)]
-    (println "node-list:" node-list)
-    (bfs-and-color node-list)))
+  (let [node-list   (build-node-list node-adj-list)
+        colored-map (bfs-and-color node-list)]
+    colored-map))
