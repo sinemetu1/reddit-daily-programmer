@@ -128,4 +128,20 @@
   (let [actual (easy-147 2)]
     (is (= actual "Invalid Score"))))
 
+(deftest test-easy-148
+  (let [actual (easy-148 '(5 1 2 3))]
+    (is (= actual 21)))
+
+  (let [actual (easy-148 '(5 0 0 0))]
+    (is (= actual 20)))
+
+  (let [actual (easy-148 '(5 3 2 1))]
+    (is (= actual 25)))
+
+  (let [actual (easy-148 '(100 25 23 1))]
+    (is (= actual 449)))
+  
+  (let [actual (easy-148 '(1 1 1 1))]
+    (is (= actual 5))))
+
 (run-tests 'reddit-daily-programmer.core-test)

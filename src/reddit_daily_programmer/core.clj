@@ -173,3 +173,19 @@
                                 (map #(easy-147 (- score %)) '(3 6 7 8)))
                         valid-score
                         invalid-score))))
+
+(defn easy-148
+  [[N frst scnd thrd]]
+  (let [n-2x          (* 2 N)
+        move-to-frst  (if (= (mod frst N) 0)
+                       n-2x
+                       (+ n-2x frst))
+        scnd-minus-N  (- N scnd)
+        move-to-scnd  (if (= (mod (+ scnd-minus-N frst) N) 0)
+                       (+ N frst)
+                       (+ scnd-minus-N frst N))
+        scnd-min-thrd (Math/abs (- scnd thrd))
+        move-to-thrd  (if (zero? scnd-min-thrd)
+                        N
+                        (Math/abs scnd-min-thrd))]
+    (+ move-to-frst move-to-scnd move-to-thrd)))
