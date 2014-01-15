@@ -161,3 +161,15 @@
   (let [node-list   (build-node-list node-adj-list)
         colored-map (bfs-and-color node-list)]
     colored-map))
+
+    (defn easy-147
+      [score]
+      (let [valid-score   "Valid Score"
+            invalid-score "Invalid Score"]
+        (cond
+          (= 0 score) valid-score
+          (< score 0) invalid-score
+          (> score 0) (if (some #(= valid-score %)
+                                (map #(easy-147 (- score %)) '(3 6 7 8)))
+                        valid-score
+                        invalid-score))))
